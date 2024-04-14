@@ -1,7 +1,6 @@
 import sys
 from PIL import Image
 from image import MyImage
-from matrix import Matrix
 from obj import OBJFile
 from vector import Vec3, Vec2
 
@@ -40,8 +39,8 @@ def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
     max_y = min(img.height - 1, max(p0.y, p1.y, p2.y))
     P = Vec2((0, 0))
     # 遍历包围盒内的每个像素
-    for P.y in range(min_y, max_y + 1):
-        for P.x in range(min_x, max_x + 1):
+    for P.y in range(min_y, max_y+1):
+        for P.x in range(min_x, max_x+1):
             # 计算当前像素的重心坐标
             bc_screen = barycentric(p0, p1, p2, P)
             if bc_screen is None:
@@ -67,68 +66,9 @@ def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
                 image.putpixel((P.x, P.y), color)
 
 
-# 摄像机摆放的位置
-cameraPos = Vec3([0, 0, 3])
-
-
-def local_2_homo(v: Vec3):
-    """
-    局部坐标变换成齐次坐标
-    """
-    m = Matrix(4, 1)
-    m[0][0] = v.x
-    m[1][0] = v.y
-    m[2][0] = v.z
-    m[3][0] = 1.0
-    return m
-
-
-# 模型变换矩阵
-def model_matrix():
-    return Matrix.identity(4)
-
-
-# 视图变换矩阵
-def view_matrix():
-    return Matrix.identity(4)
-
-
-# 透视投影变换矩阵
-def projection_matrix():
-    projection = Matrix.identity(4)
-    projection[3][2] = -1.0 / cameraPos.z
-    return projection
-
-
-# 透视除法
-def projection_division(m: Matrix):
-    m[0][0] = m[0][0] / m[3][0]
-    m[1][0] = m[1][0] / m[3][0]
-    m[2][0] = m[2][0] / m[3][0]
-    m[3][0] = 1.0
-    return m
-
-
-def viewport_matrix(x, y, w, h, depth):
-    m = Matrix.identity(4)
-    m[0][3] = x + w / 2.
-    m[1][3] = y + h / 2.
-    m[2][3] = depth / 2.
-
-    m[0][0] = w / 2.
-    m[1][1] = h / 2.
-    m[2][2] = depth / 2.
-    return m
-
-
-def homo_2_vertices(m: Matrix):
-    return Vec3([int(m[0][0]), int(m[1][0]), int(m[2][0])])
-
-
 if __name__ == '__main__':
-    width = 600
-    height = 600
-    depth = 255
+    width = 1600
+    height = 1600
 
     tga: Image = Image.open('african_head_diffuse.tga')
 
@@ -140,27 +80,17 @@ if __name__ == '__main__':
     obj = OBJFile('african_head.obj')
     obj.parse()
 
-    model_ = model_matrix()
-    view_ = view_matrix()
-    projection_ = projection_matrix()
-    viewport_ = viewport_matrix(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth)
-
     light_dir = Vec3([0, 0, -1])
     gamma = 2.2
     for face in obj.faces:
-        screen_coords = [None, None, None]
+        screen_coords = []
         world_coords = [None, None, None]
         uv_coords = [None, None, None]
         for j in range(3):
             v: Vec3 = obj.vert(face[j][0])
-            # screen_coords.append(Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
-            # screen_coords.append(Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
-
+            screen_coords.append(Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
             world_coords[j] = v
             uv_coords[j] = obj.texcoord(face[j][1])  # 获取纹理坐标
-
-            screen_coords[j] = homo_2_vertices(viewport_ *
-                                               projection_division(projection_ * view_ * model_ * local_2_homo(v)))
 
         # 计算三角形的法向量和光照强度
         n: Vec3 = (world_coords[2] - world_coords[0]).cross(world_coords[1] - world_coords[0])
@@ -173,4 +103,4 @@ if __name__ == '__main__':
                      uv_coords[0], uv_coords[1], uv_coords[2],
                      intensity, image, tga)
 
-    image.save('out.bmp')
+    image.save('out_gamma.bmp')

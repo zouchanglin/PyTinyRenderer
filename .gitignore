@@ -1,3 +1,6 @@
 venv
 .idea
 output.png
+.env
+*.bmp
+*.png
