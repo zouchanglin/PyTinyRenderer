@@ -1,13 +1,21 @@
+from PIL import Image
+
 from vector import Vec3
 
 
 class OBJFile:
-    def __init__(self, filename):
+    def __init__(self, filename, normal_map_filename=None):
         self.filename = filename
-        self.vertices = []
-        self.normals = []  # 添加一个新的列表来存储法线
-        self.texture_coords = []  # 添加一个新的列表来存储纹理坐标
+        self.vertices: list[Vec3] = []
+        self.normals: list[Vec3] = []  # 添加一个新的列表来存储法线
+        self.texture_coords: list[Vec3] = []  # 添加一个新的列表来存储纹理坐标
+        self.facet_vrt: list[int] = []
+        self.facet_tex: list[int] = []
+        self.facet_nrm: list[int] = []
         self.faces = []
+        self.normal_map = None
+        if normal_map_filename:
+            self.normal_map = Image.open(normal_map_filename)
 
     def parse(self):
         with open(self.filename, 'r') as file:
@@ -45,3 +53,13 @@ class OBJFile:
         :return:
         """
         return Vec3(self.texture_coords[i - 1])
+
+    def normal(self, uvf):
+        if self.normal_map:
+            width, height = self.normal_map.size
+            x = int(uvf[0] * width)
+            y = int(uvf[1] * height)
+            r, g, b = self.normal_map.getpixel((x, y))
+            return Vec3([r, g, b]) * (2.0 / 255.0) - Vec3([1, 1, 1])
+        else:
+            return None
