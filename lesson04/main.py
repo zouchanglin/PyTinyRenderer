@@ -79,10 +79,10 @@ def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
 
 # 摄像机摆放的位置
 # cameraPos = Vec3([0, 0, 3])
-eye_position = Vec3([1, 1, 3])
-center = Vec3([0, 0, 0])
+eye_position = Vec3(1, 1, 3)
+center = Vec3(0, 0, 0)
 
-camera = Camera(eye_position, Vec3([0, 1, 0]), center - eye_position)
+camera = Camera(eye_position, Vec3(0, 1, 0), center - eye_position)
 
 
 def local_2_homo(v: Vec3):
@@ -162,14 +162,14 @@ if __name__ == '__main__':
     height = 1600
     depth = 255
 
-    tga: Image = Image.open('african_head_diffuse.tga')
+    tga: Image = Image.open('../african_head_diffuse.tga')
 
     image = MyImage((width, height))
 
     # -sys.maxsize - 1 最小值
     z_buffer = [-sys.maxsize - 1] * width * height
 
-    obj = OBJFile('african_head.obj')
+    obj = OBJFile('../african_head.obj')
     obj.parse()
 
     model_ = model_matrix()

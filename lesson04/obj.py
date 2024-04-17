@@ -22,6 +22,7 @@ class OBJFile:
                         self.faces.append([[int(index.split('/')[0]),
                                             int(index.split('/')[1])] for index in components[1:]])
                         # self.faces.append([int(index.split('/')[0]) for index in components[1:]])
+        print('x')
 
     def vert(self, i):
         """

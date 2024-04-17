@@ -11,6 +11,8 @@ Projection: Matrix
 
 def viewport(x, y, w, h, depth=255):
     global Viewport
+    # Viewport = np.array([[w/2.0, 0, 0, x+w/2.0], [0, h/2.0, 0, y+h/2.0], [0, 0, 1, 0], [0, 0, 0, 1]])
+    global Viewport
     m = Matrix.identity(4)
     m[0][3] = x + w / 2.0
     m[1][3] = y + h / 2.0
@@ -59,31 +61,33 @@ def barycentric(tri, p):
     u = triangle_area_2d(p, b, c) / total_area
     v = triangle_area_2d(p, c, a) / total_area
     w = triangle_area_2d(p, a, b) / total_area
-    return Vec3([u, v, w])
+    return Vec3(u, v, w)
 
 
-def triangle(v: list[Vec4], shader: IShader, image, z_buffer):
-    for x in v:
-        pass
+def triangle(vs: list[Vec4], shader: IShader, image, z_buffer):
     # 转换到屏幕坐标
-    screen_coords = [Viewport.m * x for x in v]
+    # screen_coords = [Viewport.data * x for x in v]
+    screen_coords = []
+    for v in vs:
+        # ret = Viewport.data @ [v.x, v.y, v.z, v.w]
+        screen_coords.append(v)
 
     # 计算包围盒
-    min_x = max(0, min([v.x for v in screen_coords]))
-    max_x = min(image.width - 1, max([v.x for v in screen_coords]))
-    min_y = max(0, min([v.y for v in screen_coords]))
-    max_y = min(image.height - 1, max([v.y for v in screen_coords]))
-
+    min_x = int(max(0, min([v.x for v in screen_coords])))
+    max_x = int(min(image.width - 1, max([v.x for v in screen_coords])))
+    min_y = int(max(0, min([v.y for v in screen_coords])))
+    max_y = int(min(image.height - 1, max([v.y for v in screen_coords])))
+    print(min_x, max_x, min_y, max_y)
     # 对包围盒中的每个像素进行插值
-    P = Vec2((0, 0))
+    P = Vec2(0, 0)
     for P.y in range(min_y, max_y + 1):
         for P.x in range(min_x, max_x + 1):
             bc_screen = barycentric(screen_coords, P)
             if bc_screen is None or bc_screen.x < 0 or bc_screen.y < 0 or bc_screen.z < 0:
                 continue
-            bc_clip = np.array([bc_screen.get(i) / v[i].w for i in range(3)])
+            bc_clip = np.array([bc_screen.get(i) / vs[i].w for i in range(3)])
             bc_clip /= bc_clip.sum()
-            frag_depth = np.dot(bc_clip, [v[i].z for i in range(3)])
+            frag_depth = np.dot(bc_clip, [vs[i].z for i in range(3)])
             idx = int(P.x + P.y * image.width)
             if frag_depth > z_buffer[idx]:
                 continue

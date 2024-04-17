@@ -2,18 +2,18 @@ import math
 
 
 class Vec2:
-    def __init__(self, values):
-        self.x, self.y = values
+    def __init__(self, x, y):
+        self.x, self.y = x, y
 
     def __add__(self, other):
-        return Vec2([self.x + other.x, self.y + other.y])
+        return Vec2(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other):
-        return Vec2([self.x - other.x, self.y - other.y])
+        return Vec2(self.x - other.x, self.y - other.y)
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):  # 向量和标量的乘法
-            return Vec2([self.x * other, self.y * other])
+            return Vec2(self.x * other, self.y * other)
         elif isinstance(other, Vec2):  # 两个向量的点积
             return self.x * other.x + self.y * other.y
 
@@ -56,18 +56,18 @@ class Vec2:
 
 
 class Vec3:
-    def __init__(self, values):
-        self.x, self.y, self.z = values
+    def __init__(self, x, y, z):
+        self.x, self.y, self.z = x, y, z
 
     def __add__(self, other):
-        return Vec3([self.x + other.x, self.y + other.y, self.z + other.z])
+        return Vec3(self.x + other.x, self.y + other.y, self.z + other.z)
 
     def __sub__(self, other):
-        return Vec3([self.x - other.x, self.y - other.y, self.z - other.z])
+        return Vec3(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):  # 向量和标量的乘法
-            return Vec3([self.x * other, self.y * other, self.z * other])
+            return Vec3(self.x * other, self.y * other, self.z * other)
         elif isinstance(other, Vec3):  # 两个向量的点积
             return self.x * other.x + self.y * other.y + self.z * other.z
 
@@ -75,9 +75,9 @@ class Vec3:
         return self.__mul__(scalar)
 
     def cross(self, other):
-        return Vec3([self.y * other.z - self.z * other.y,
-                     self.z * other.x - self.x * other.z,
-                     self.x * other.y - self.y * other.x])
+        return Vec3(self.y * other.z - self.z * other.y,
+                    self.z * other.x - self.x * other.z,
+                    self.x * other.y - self.y * other.x)
 
     def norm(self):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
@@ -96,6 +96,7 @@ class Vec3:
             return self.y
         elif i == 2:
             return self.z
+
     def __getitem__(self, index):
         if index == 0:
             return self.x
@@ -121,18 +122,18 @@ class Vec3:
 
 
 class Vec4:
-    def __init__(self, values):
-        self.x, self.y, self.z, self.w = values
+    def __init__(self, x, y, z, w):
+        self.x, self.y, self.z, self.w = x, y, z, w
 
     def __add__(self, other):
-        return Vec4([self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w])
+        return Vec4(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
 
     def __sub__(self, other):
-        return Vec4([self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w])
+        return Vec4(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):  # 向量和标量的乘法
-            return Vec4([self.x * other, self.y * other, self.z * other, self.w * other])
+            return Vec4(self.x * other, self.y * other, self.z * other, self.w * other)
         elif isinstance(other, Vec4):  # 两个向量的点积
             return self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
 
