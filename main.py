@@ -9,11 +9,6 @@ from matrix import Matrix
 from obj import OBJFile
 from vector import Vec3, Vec2
 
-white = (255, 255, 255)
-red = (255, 0, 0)
-green = (0, 255, 0)
-blue = (0, 0, 255)
-
 
 def triangle_area_2d(a: Vec2, b: Vec2, c: Vec2) -> float:
     """
@@ -32,7 +27,7 @@ def barycentric(A, B, C, P):
     u = triangle_area_2d(P, B, C) / total_area
     v = triangle_area_2d(P, C, A) / total_area
     w = triangle_area_2d(P, A, B) / total_area
-    return Vec3([u, v, w])
+    return Vec3(u, v, w)
 
 
 def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
@@ -43,11 +38,6 @@ def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
     min_y = max(0, min(p0.y, p1.y, p2.y))
     max_y = min(img.height - 1, max(p0.y, p1.y, p2.y))
     P = Vec2((0, 0))
-
-    # 计算三角形的颜色 Flat Shading
-    # uv = Vec3([(uv0 + uv1 + uv2).x/3, (uv0 + uv1 + uv2).y/3, (uv0 + uv1 + uv2).z/3])
-    # color = tga.getpixel((int(uv.x * tga.width), tga.height - 1 - int(uv.y * tga.height)))
-    # color = (int(color[0] * intensity), int(color[1] * intensity), int(color[2] * intensity))
 
     # 遍历包围盒内的每个像素
     for P.y in range(min_y, max_y + 1):
@@ -78,7 +68,6 @@ def triangle(p0: Vec3, p1: Vec3, p2: Vec3,
 
 
 # 摄像机摆放的位置
-# cameraPos = Vec3([0, 0, 3])
 eye_position = Vec3(1, 1, 3)
 center = Vec3(0, 0, 0)
 
@@ -101,10 +90,6 @@ def local_2_homo(v: Vec3):
 def model_matrix():
     return Matrix.identity(4)
 
-
-# 视图变换矩阵
-# def view_matrix():
-#     return Matrix.identity(4)
 
 def view_matrix(camera: Camera):
     r_inverse = np.identity(4)
@@ -158,18 +143,18 @@ def homo_2_vertices(m: Matrix):
 
 
 if __name__ == '__main__':
-    width = 1600
-    height = 1600
+    width = 1200
+    height = 1200
     depth = 255
 
-    tga: Image = Image.open('../african_head_diffuse.tga')
+    tga: Image = Image.open('african_head_diffuse.tga')
 
     image = MyImage((width, height))
 
     # -sys.maxsize - 1 最小值
     z_buffer = [-sys.maxsize - 1] * width * height
 
-    obj = OBJFile('../african_head.obj')
+    obj = OBJFile('african_head.obj')
     obj.parse()
 
     model_ = model_matrix()
@@ -179,18 +164,14 @@ if __name__ == '__main__':
 
     light_dir = Vec3([0, 0, -1])
     gamma = 2.2
-    for face in obj.faces:
+    for i in range(obj.n_face()):
         screen_coords = [None, None, None]  # 第i个面片三个顶点的屏幕坐标
         world_coords = [None, None, None]  # 第i个面片三个顶点的世界坐标
         uv_coords = [None, None, None]
         for j in range(3):
-            v: Vec3 = obj.vert(face[j][0])
-            # screen_coords.append(Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
-            # screen_coords.append(Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
-            # screen_coords[j] = (Vec3([int((v.x + 1) * width / 2), int((v.y + 1) * height / 2), v.z]))
-
+            v: Vec3 = obj.vert(i, j)
             world_coords[j] = v
-            uv_coords[j] = obj.texcoord(face[j][1])  # 获取纹理坐标
+            uv_coords[j] = obj.uv(i, j)  # 获取纹理坐标
 
             screen_coords[j] = homo_2_vertices(viewport_ * projection_division(
                 projection_ * view_ * model_ * local_2_homo(v)))

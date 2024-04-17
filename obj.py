@@ -32,12 +32,13 @@ class OBJFile:
                     self.norms.append(Vec3(*map(float, components[1:4])))
                 elif components[0] == 'vt':
                     self.tex_coord.append(Vec2(float(components[1]), float(components[2])))
+                    # self.tex_coord.append(float(coord) for coord in components[1:])
                 elif components[0] == 'f':
                     for sp in components[1:]:
                         p = sp.split('/')
-                        self.facet_vrt.append(int(p[0]))
-                        self.facet_tex.append(int(p[1]))
-                        self.facet_nrm.append(int(p[2]))
+                        self.facet_vrt.append(int(p[0])-1)
+                        self.facet_tex.append(int(p[1])-1)
+                        self.facet_nrm.append(int(p[2])-1)
         # 打印顶点、面片、纹理坐标和法向量的数量
         print(f"# v# {self.n_vertex()} f# {self.n_face()} vt# {len(self.tex_coord)} vn# {len(self.norms)}")
 
@@ -69,7 +70,6 @@ class OBJFile:
         tex_file = self.model_file[:dot] + suffix
         self.diffuse_map = Image.open(tex_file)
         print(f'Loading texture: {tex_file}--->{img}')
-        # self.diffuse_map
         # print(f"texture file {tex_file} loading {'ok' if img.load(tex_file) else 'failed'}")
 
     def normal(self, uvf: Vec2 = None, i: int = None, n: int = None) -> Vec3:
