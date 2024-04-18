@@ -8,6 +8,10 @@ class Vec2:
         else:
             self.x, self.y = x, y
 
+    @staticmethod
+    def zero():
+        return Vec3(0, 0)
+
     def __add__(self, other):
         return Vec2(self.x + other.x, self.y + other.y)
 
@@ -58,6 +62,11 @@ class Vec3:
             self.x, self.y, self.z = x[0], x[1], x[2]
         else:
             self.x, self.y, self.z = x, y, z
+
+
+    @staticmethod
+    def zero():
+        return Vec3(0, 0, 0)
 
 
     def __add__(self, other):

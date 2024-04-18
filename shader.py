@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 from PIL import Image
 
-from vector import Vec2, Vec4, Vec3
+from color import Color
+from vector import Vec2, Vec3
 
 
 class IShader(ABC):
@@ -12,9 +13,9 @@ class IShader(ABC):
         return pixel
 
     @abstractmethod
-    def vertex(self, iface: int, nthvert: int) -> Vec4:
+    def vertex(self, iface: int, n: int):
         pass
 
     @abstractmethod
-    def fragment(self, bar: Vec3):
+    def fragment(self, bar: Vec3) -> (bool, Color):
         pass
