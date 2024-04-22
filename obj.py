@@ -44,8 +44,8 @@ class OBJFile:
 
         # 加载纹理
         self.load_texture("_diffuse.tga", self.diffuse_map)
-        # self.load_texture("_nm_tangent.tga", self.normal_map)
-        # self.load_texture("_spec.tga", self.specular_map)
+        self.load_texture("_nm_tangent.tga", self.normal_map)
+        self.load_texture("_spec.tga", self.specular_map)
 
     def n_vertex(self) -> int:
         # 返回顶点数量
@@ -68,9 +68,16 @@ class OBJFile:
         if dot == -1:
             return
         tex_file = self.model_file[:dot] + suffix
-        self.diffuse_map = Image.open(tex_file)
-        print(f'Loading texture: {tex_file}--->{img}')
-        # print(f"texture file {tex_file} loading {'ok' if img.load(tex_file) else 'failed'}")
+        # 判断文件是否存在
+        if suffix.endswith('_diffuse.tga'):
+            self.diffuse_map = Image.open(tex_file)
+            print(f'Loading _diffuse_map texture: {tex_file}--->{img}')
+        elif suffix.endswith('_nm_tangent.tga'):
+            self.normal_map = Image.open(tex_file)
+            print(f'Loading _nm_tangent texture: {tex_file}')
+        elif suffix.endswith('_spec.tga'):
+            self.specular_map = Image.open(tex_file)
+            print(f'Loading _spec texture: {tex_file}')
 
     def normal(self, uvf: Vec2 = None, i: int = None, n: int = None) -> Vec3:
         """
