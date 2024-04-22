@@ -1,5 +1,7 @@
 import math
 
+from matrix import Matrix
+
 
 class Vec2:
     def __init__(self, x, y=None):
@@ -7,6 +9,12 @@ class Vec2:
             self.x, self.y = x[0], x[1]
         else:
             self.x, self.y = x, y
+
+    def to_matrix(self):
+        m = Matrix(2, 1).m
+        m[0, 0] = self.x
+        m[1, 0] = self.y
+        return m
 
     @staticmethod
     def zero():
@@ -63,6 +71,12 @@ class Vec3:
         else:
             self.x, self.y, self.z = x, y, z
 
+    def to_matrix(self):
+        m = Matrix(3, 1).m
+        m[0, 0] = self.x
+        m[1, 0] = self.y
+        m[2, 0] = self.z
+        return m
 
     @staticmethod
     def zero():

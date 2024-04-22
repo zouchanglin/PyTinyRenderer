@@ -9,8 +9,8 @@ from obj import OBJFile
 from shader import IShader
 from vector import Vec3, Vec2
 
-width = 600
-height = 600
+width = 900
+height = 900
 depth = 255
 
 # 光照方向
@@ -46,8 +46,12 @@ class MyShader(IShader):
         # self.uv_coords[j] = obj.uv(i, n)
         # v: Vec3 = obj.vert(i, n)
         # return homo_2_vertices(viewport_ * projection_division(projection_ * view_ * model_ * local_2_homo(v)))
-        self.varying_uv[n] = obj.uv(iface, n)
-        # TODO 完成基于法线贴图渲染
+
+        # 基于法线贴图渲染
+        self.varying_uv.set_col(n, obj.uv(iface, n))
+        v: Vec3 = obj.vert(iface, n)
+        return homo_2_vertices(viewport_ * projection_division(projection_ * view_ * model_ * local_2_homo(v)))
+
 
     def fragment(self, bar: Vec3):
         """
@@ -55,13 +59,29 @@ class MyShader(IShader):
         :param bar: 重心坐标
         :return:
         """
-        intensity = self.varying_intensity * bar
+        # intensity = self.varying_intensity * bar
+        # if intensity < 0:
+        #     return True, None
+        # uv0, uv1, uv2 = self.uv_coords
+        # uv = uv0 * bar.x + uv1 * bar.y + uv2 * bar.z
+        # tga = obj.diffuse_map
+        # color = tga.getpixel((int(uv.x * tga.width), tga.height - 1 - int(uv.y * tga.height)))
+        # color = Color(int(color[0] * intensity), int(color[1] * intensity), int(color[2] * intensity))
+        # return False, color
+
+        uv: Vec2 = Vec2((self.varying_uv.m @ bar.to_matrix())[0][0], (self.varying_uv.m @ bar.to_matrix())[1][0])
+
+        n = (self.uniform_MIT * local_2_homo(obj.normal(uv))).m
+        n: Vec3 = Vec3(n[0][0], n[1][0], n[2][0]).normalize()
+        l = (self.uniform_M * local_2_homo(light_dir)).m
+        l: Vec3 = Vec3(l[0][0], l[1][0], l[2][0]).normalize()
+
+        intensity: float = max(0.0, n * l)
         if intensity < 0:
             return True, None
-        uv0, uv1, uv2 = self.uv_coords
-        uv = uv0 * bar.x + uv1 * bar.y + uv2 * bar.z
         tga = obj.diffuse_map
         color = tga.getpixel((int(uv.x * tga.width), tga.height - 1 - int(uv.y * tga.height)))
+        # color = [255, 255, 255]
         color = Color(int(color[0] * intensity), int(color[1] * intensity), int(color[2] * intensity))
         return False, color
 

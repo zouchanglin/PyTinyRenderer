@@ -1,11 +1,21 @@
 import numpy as np
 
 
+
 class Matrix:
     def __init__(self, r=4, c=4):
         self.m = np.zeros((r, c), dtype=float)
         self.rows = r
         self.cols = c
+
+    def set_col(self, idx, v):
+        from vector import Vec2, Vec3
+        if isinstance(v, Vec2):
+            v = [v.x, v.y]  # convert Vec2 object to list
+        if 0 <= idx < self.cols:
+            self.m[:, idx] = v
+        else:
+            raise IndexError("Column index out of range")
 
     @staticmethod
     def identity(dimensions):
@@ -17,7 +27,14 @@ class Matrix:
         assert 0 <= i < self.rows
         return self.m[i]
 
+    # def __mul__(self, a):
+    #     assert self.cols == a.rows
+    #     return Matrix.from_np(self.m @ a.m)
+
     def __mul__(self, a):
+        from vector import Vec2, Vec3
+        if isinstance(a, Vec2) or isinstance(a, Vec3):
+            a = a.to_matrix()
         assert self.cols == a.rows
         return Matrix.from_np(self.m @ a.m)
 

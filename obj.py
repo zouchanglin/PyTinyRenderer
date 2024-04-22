@@ -85,7 +85,7 @@ class OBJFile:
         """
         if uvf is not None:
             # 从法线贴图获取法线
-            c = self.normal_map.getpixel((uvf.x * self.normal_map.width, uvf.y * self.normal_map.height))
+            c = self.normal_map.getpixel((uvf.x * self.normal_map.width, self.normal_map.height - 1 - uvf.y * self.normal_map.height))
             return Vec3(c[2], c[1], c[0]) * (2. / 255.) - Vec3(1, 1, 1)
         # 从法向量数组获取法线
         return self.norms[self.facet_nrm[i * 3 + n]]
