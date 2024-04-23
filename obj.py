@@ -90,6 +90,10 @@ class OBJFile:
         # 从法向量数组获取法线
         return self.norms[self.facet_nrm[i * 3 + n]]
 
+    def specular(self, uvf: Vec2 = None):
+        c = self.specular_map.getpixel((uvf.x * self.specular_map.width, self.specular_map.height - 1 - uvf.y * self.specular_map.height))
+        return c / 128
+
     def uv(self, iface: int, n: int) -> Vec2:
         """
         返回纹理坐标

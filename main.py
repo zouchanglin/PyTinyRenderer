@@ -9,15 +9,15 @@ from obj import OBJFile
 from shader import IShader
 from vector import Vec3, Vec2
 
-width = 900
-height = 900
+width = 1200
+height = 1200
 depth = 255
 
 # 光照方向
 light_dir = Vec3(0, 0, 1)
 
 # 摄像机摆放的位置
-eye = Vec3(1, 1, 2)
+eye = Vec3(1, 1, 3)
 center = Vec3(0, 0, 0)
 up = Vec3(0, 1, 0)
 
@@ -76,13 +76,19 @@ class MyShader(IShader):
         l = (self.uniform_M * local_2_homo(light_dir)).m
         l: Vec3 = Vec3(l[0][0], l[1][0], l[2][0]).normalize()
 
+        r = (n*(n*l*2.) - l).normalize()
+        specular = pow(max(r.z, 0.0), obj.specular(uv))
+
         intensity: float = max(0.0, n * l)
         if intensity < 0:
             return True, None
         tga = obj.diffuse_map
         color = tga.getpixel((int(uv.x * tga.width), tga.height - 1 - int(uv.y * tga.height)))
         # color = [255, 255, 255]
-        color = Color(int(color[0] * intensity), int(color[1] * intensity), int(color[2] * intensity))
+        a = int(color[0] * (intensity + 0.8 * specular))
+        b = int(color[1] * (intensity + 0.8 * specular))
+        c = int(color[2] * (intensity + 0.8 * specular))
+        color = (min(a, 255), min(b, 255), min(c, 255))
         return False, color
 
 
